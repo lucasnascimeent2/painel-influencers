@@ -267,36 +267,8 @@ MESES_PT = {
 @st.cache_data(ttl=60)
 def carregar_dados():
     try:
-        # Tenta diferentes encodings
-        encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
-        
-        df_vendas = None
-        df_usuarios = None
-        
-        # Tenta carregar vendas.csv
-        for encoding in encodings:
-            try:
-                df_vendas = pd.read_csv(ARQUIVO_VENDAS, encoding=encoding)
-                break
-            except:
-                continue
-        
-        if df_vendas is None:
-            st.error("Não foi possível carregar vendas.csv com nenhuma codificação")
-            return None, None
-        
-        # Tenta carregar usuario.csv
-        for encoding in encodings:
-            try:
-                df_usuarios = pd.read_csv(ARQUIVO_USUARIOS, encoding=encoding)
-                break
-            except:
-                continue
-        
-        if df_usuarios is None:
-            st.error("Não foi possível carregar usuario.csv com nenhuma codificação")
-            return None, None
-        
+        df_vendas = pd.read_csv(ARQUIVO_VENDAS)
+        df_usuarios = pd.read_csv(ARQUIVO_USUARIOS)
         df_usuarios['cupom'] = df_usuarios['cupom'].astype(str).str.upper().str.strip()
         df_usuarios['senha'] = df_usuarios['senha'].astype(str).str.strip()
         return df_vendas, df_usuarios
