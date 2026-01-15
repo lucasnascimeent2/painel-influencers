@@ -234,7 +234,13 @@ PORCENTAGEM_COMISSAO_PADRAO = 20.0
 @st.cache_data
 def carregar_dados():
     try:
-        df_vendas = pd.read_csv(ARQUIVO_VENDAS)
+        # Tenta ler com separador padrão (vírgula) e decimal brasileiro (vírgula)
+        df_vendas = pd.read_csv(ARQUIVO_VENDAS, decimal=',', sep=';', thousands='.')
+        
+        # Se falhar, tenta formato americano (ponto como decimal)
+        if df_vendas.empty or len(df_vendas.columns) < 4:
+            df_vendas = pd.read_csv(ARQUIVO_VENDAS)
+        
         df_usuarios = pd.read_csv(ARQUIVO_USUARIOS)
         df_usuarios['cupom'] = df_usuarios['cupom'].astype(str).str.upper().str.strip()
         df_usuarios['senha'] = df_usuarios['senha'].astype(str).str.strip()
@@ -424,17 +430,17 @@ def main():
         # Pódio
         renderizar_podio(df_vendas)
 
-        # Processamento de dados
+        # Processamento de dados - As 4 colunas são: codigo, quantidade, vendas_mes, valor_total_de_vendas
         colunas = df_vendas.columns.tolist()
-        coluna_codigo = colunas[0]  # Coluna A - código
-        coluna_qtd = colunas[1]     # Coluna B - quantidade
-        coluna_vendas_mes = colunas[2]  # Coluna C - vendas_mes
-        coluna_valor_total = colunas[3] if len(colunas) > 3 else colunas[2]  # Coluna D - valor_total_de_vendas
+        coluna_codigo = colunas[0]  # Coluna A
+        coluna_qtd = colunas[1]     # Coluna B
+        coluna_vendas_mes = colunas[2]  # Coluna C
+        coluna_valor_total = colunas[3]  # Coluna D
         
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
 
         if not dados_vendas.empty:
-            # Vendas Totais no mês = coluna C (vendas_mes)
+            # Vendas Totais no mês = coluna C
             vendas_mes = dados_vendas[coluna_vendas_mes].values[0]
             
             # Quantidade de vendas = coluna B
@@ -443,12 +449,8 @@ def main():
             # Comissão calculada sobre vendas do mês
             comissao = vendas_mes * (PORCENTAGEM_COMISSAO_PADRAO / 100)
             
-            # Vendas período total = coluna D (valor_total_de_vendas)
+            # Vendas período total = coluna D (deve ser 15000 para YNAIA10)
             vendas_totais = dados_vendas[coluna_valor_total].values[0]
-            
-            # DEBUG: Mostra os valores lidos (remover depois)
-            st.write(f"DEBUG - Coluna D ({coluna_valor_total}): {vendas_totais}")
-            st.write(f"DEBUG - Dados da linha completa: {dados_vendas.iloc[0].to_dict()}")
         else:
             vendas_mes = 0
             qtd = 0
