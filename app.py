@@ -5,8 +5,8 @@ import pandas as pd
 st.set_page_config(page_title="Portal do Influencer", layout="centered")
 
 # --- CONFIGURAÇÕES ---
-ARQUIVO_DADOS = 'green-line-premium3-relatorio-de-vendas-por-cupom-15_01_2026_09_52_52-FkcQO.csv'
-PORCENTAGEM_COMISSAO_PADRAO = 10.0  # Defina aqui a comissão padrão (ex: 10%)
+ARQUIVO_DADOS = 'vendas.csv'
+PORCENTAGEM_COMISSAO_PADRAO = 20.0  # Defina aqui a comissão padrão (ex: 10%)
 
 # Função para carregar dados
 @st.cache_data
@@ -20,7 +20,7 @@ def carregar_dados():
         return None
 
 def main():
-    st.title("💚 Portal do Parceiro Green Line")
+    st.title("💚 Portal do Parceiro Green Express")
     st.markdown("---")
 
     df = carregar_dados()
@@ -69,4 +69,5 @@ def main():
             st.write(f"Total Geral Vendido: R$ {df['valor_total_das_vendas'].sum():,.2f}")
 
 if __name__ == "__main__":
+
     main()
