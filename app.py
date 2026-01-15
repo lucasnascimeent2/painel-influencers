@@ -255,10 +255,13 @@ def renderizar_header_centralizado():
 
 def renderizar_podio(df_vendas):
     """Renderiza o pódio com top 3 parceiras - APENAS TEXTO"""
-    coluna_codigo = 'código' if 'código' in df_vendas.columns else 'codigo'
+    # Detecta nomes das colunas automaticamente
+    colunas = df_vendas.columns.tolist()
+    coluna_codigo = colunas[0]  # Primeira coluna = código/cupom
+    coluna_valor_mes = colunas[2]  # Terceira coluna = valor vendas no mês
     
     # Pega top 3
-    top3 = df_vendas.nlargest(3, 'valor_de_vendas_no_mes').head(3)
+    top3 = df_vendas.nlargest(3, coluna_valor_mes).head(3)
     
     if len(top3) == 0:
         st.info("Ainda não há dados de vendas para exibir o ranking.")
@@ -277,7 +280,7 @@ def renderizar_podio(df_vendas):
         if idx < len(top3):
             row = top3.iloc[idx]
             cupom = row[coluna_codigo]
-            valor = row['valor_de_vendas_no_mes']
+            valor = row[coluna_valor_mes]
             
             card_class = f"podium-card-{medal_numbers[idx]}"
             
@@ -421,21 +424,27 @@ def main():
         renderizar_podio(df_vendas)
 
         # Processamento de dados - CORRIGIDO
-        coluna_codigo = 'código' if 'código' in df_vendas.columns else 'codigo'
+        # Detecta nomes das colunas automaticamente
+        colunas = df_vendas.columns.tolist()
+        coluna_codigo = colunas[0]  # Coluna A
+        coluna_qtd = colunas[1]     # Coluna B
+        coluna_valor_mes = colunas[2]  # Coluna C
+        coluna_valor_total = colunas[3] if len(colunas) > 3 else colunas[2]  # Coluna D
+        
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
 
         if not dados_vendas.empty:
             # Vendas no mês (coluna C)
-            vendas_mes = dados_vendas['valor_de_vendas_no_mes'].values[0]
+            vendas_mes = dados_vendas[coluna_valor_mes].values[0]
             
             # Quantidade de vendas (coluna B)
-            qtd = dados_vendas['quantidade_de_vendas'].values[0]
+            qtd = dados_vendas[coluna_qtd].values[0]
             
             # Comissão calculada sobre vendas no mês
             comissao = vendas_mes * (PORCENTAGEM_COMISSAO_PADRAO / 100)
             
             # Vendas período total (coluna D) - INDIVIDUAL da influencer
-            vendas_totais = dados_vendas['valor_total_de_vendas'].values[0]
+            vendas_totais = dados_vendas[coluna_valor_total].values[0]
         else:
             vendas_mes = 0
             qtd = 0
