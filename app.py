@@ -21,23 +21,23 @@ def local_css():
         /* Logo e Título */
         .header-container {
             text-align: center;
-            padding: 20px 0;
+            padding: 30px 0 20px 0;
         }
-        .titulo-principal {
-            font-family: 'Arial', sans-serif;
-            font-weight: 700;
-            color: #ffffff;
-            font-size: 36px;
-            margin: 10px 0 5px 0;
+        .logo-img {
+            max-width: 150px;
+            margin: 0 auto;
+            display: block;
         }
         .subtitulo {
             color: #00cc66;
             font-size: 16px;
             font-weight: 400;
-            margin-bottom: 20px;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Pódio de Ranking */
+        /* Pódio de Ranking - TEXTO SIMPLES */
         .podium-container {
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
             border-radius: 15px;
@@ -50,52 +50,40 @@ def local_css():
             font-size: 20px;
             font-weight: 600;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-        .podium-flex {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            gap: 10px;
-            margin-top: 20px;
+        .podium-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
         }
-        .podium-item {
-            text-align: center;
-            min-width: 100px;
-        }
-        .podium-position {
+        .podium-card {
             background: #2a2a2a;
             border-radius: 10px;
-            padding: 15px 10px;
-            margin-top: 10px;
+            padding: 20px 15px;
+            text-align: center;
             border: 2px solid;
         }
-        .podium-1 { 
-            order: 2; 
-            border-color: #FFD700 !important;
-        }
-        .podium-2 { 
-            order: 1; 
-            border-color: #C0C0C0 !important;
-        }
-        .podium-3 { 
-            order: 3; 
-            border-color: #CD7F32 !important;
-        }
-        .podium-rank {
+        .podium-card-1 { border-color: #FFD700; }
+        .podium-card-2 { border-color: #C0C0C0; }
+        .podium-card-3 { border-color: #CD7F32; }
+        
+        .podium-position {
             font-size: 48px;
             font-weight: 700;
-            margin: 10px 0;
+            margin: 5px 0;
         }
         .podium-cupom {
             color: #00cc66;
             font-weight: 600;
-            font-size: 14px;
-            margin: 5px 0;
+            font-size: 15px;
+            margin: 10px 0 8px 0;
         }
         .podium-value {
             color: #ffffff;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
         }
 
@@ -250,41 +238,63 @@ def carregar_dados():
 # --------------------------------------------------------------------------
 # 4. COMPONENTES VISUAIS
 # --------------------------------------------------------------------------
+def renderizar_header_centralizado():
+    """Header centralizado com logo e texto"""
+    st.markdown("<div class='header-container'>", unsafe_allow_html=True)
+    
+    # Tenta carregar a logo
+    try:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image("logo.png", use_container_width=True)
+    except:
+        st.markdown("💚", unsafe_allow_html=True)
+    
+    st.markdown("<div class='subtitulo'>Portal de Parceiras Green Express</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
 def renderizar_podio(df_vendas):
-    """Renderiza o pódio com top 3 parceiras"""
-    coluna_codigo = 'código' if 'código' in df_vendas.columns else 'Codigo'
+    """Renderiza o pódio com top 3 parceiras - APENAS TEXTO"""
+    coluna_codigo = 'código' if 'código' in df_vendas.columns else 'codigo'
     
     # Pega top 3
-    top3 = df_vendas.nlargest(3, 'valor_total_das_vendas')
+    top3 = df_vendas.nlargest(3, 'valor_de_vendas_no_mes').head(3)
     
-    podio_html = "<div class='podium-container'>"
-    podio_html += "<div class='podium-title'>🏆 RANKING DO MÊS</div>"
-    podio_html += "<div class='podium-flex'>"
+    if len(top3) == 0:
+        st.info("Ainda não há dados de vendas para exibir o ranking.")
+        return
     
-    positions = ['2', '1', '3']  # Ordem visual: 2º, 1º, 3º
-    colors = {'1': '#FFD700', '2': '#C0C0C0', '3': '#CD7F32'}
+    st.markdown("<div class='podium-container'>", unsafe_allow_html=True)
+    st.markdown("<div class='podium-title'>🏆 RANKING DO MÊS</div>", unsafe_allow_html=True)
+    st.markdown("<div class='podium-grid'>", unsafe_allow_html=True)
     
-    for idx, pos in enumerate(positions):
-        real_idx = int(pos) - 1
-        if real_idx < len(top3):
-            row = top3.iloc[real_idx]
+    # Ordem: 2º (esquerda), 1º (centro), 3º (direita)
+    positions = [1, 0, 2]  # Índices: 2º lugar, 1º lugar, 3º lugar
+    medal_colors = {0: '#FFD700', 1: '#C0C0C0', 2: '#CD7F32'}
+    medal_numbers = {0: '1', 1: '2', 2: '3'}
+    
+    for idx in positions:
+        if idx < len(top3):
+            row = top3.iloc[idx]
             cupom = row[coluna_codigo]
-            valor = row['valor_total_das_vendas']
+            valor = row['valor_de_vendas_no_mes']
             
-            podio_html += f"""
-            <div class='podium-item'>
+            card_class = f"podium-card-{medal_numbers[idx]}"
+            
+            st.markdown(f"""
+            <div class='podium-card {card_class}'>
+                <div class='podium-position' style='color: {medal_colors[idx]};'>{medal_numbers[idx]}</div>
                 <div class='podium-cupom'>{cupom}</div>
-                <div class='podium-rank' style='color: {colors[pos]};'>{pos}</div>
-                <div class='podium-position podium-{pos}'>
-                    <div class='podium-value'>R$ {valor:,.2f}</div>
-                </div>
+                <div class='podium-value'>R$ {valor:,.2f}</div>
             </div>
-            """
+            """, unsafe_allow_html=True)
+        else:
+            # Card vazio se não houver 3 participantes
+            st.markdown("<div class='podium-card' style='opacity: 0.3;'><div class='podium-position'>-</div></div>", unsafe_allow_html=True)
     
-    podio_html += "</div></div>"
-    st.markdown(podio_html, unsafe_allow_html=True)
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
-def renderizar_resultados(vendas, qtd, comissao, vendas_totais_periodo):
+def renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais):
     """Renderiza os cards de resultados"""
     st.markdown("<div class='result-card'>", unsafe_allow_html=True)
     st.markdown("<div class='result-title'>Acesso aos Resultados</div>", unsafe_allow_html=True)
@@ -295,7 +305,7 @@ def renderizar_resultados(vendas, qtd, comissao, vendas_totais_periodo):
         st.markdown(f"""
         <div class='metric-box'>
             <div class='metric-label'>Vendas Totais no mês</div>
-            <div class='metric-value'>R$ {vendas:,.2f}</div>
+            <div class='metric-value'>R$ {vendas_mes:,.2f}</div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -317,7 +327,7 @@ def renderizar_resultados(vendas, qtd, comissao, vendas_totais_periodo):
     st.markdown(f"""
     <div class='metric-box' style='border-color: #666;'>
         <div class='metric-label'>Vendas período total</div>
-        <div class='metric-value'>R$ {vendas_totais_periodo:,.2f}</div>
+        <div class='metric-value'>R$ {vendas_totais:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -364,13 +374,8 @@ def main():
 
     # --- TELA DE LOGIN ---
     if not st.session_state['logado']:
-        # Header
-        st.markdown("""
-        <div class='header-container'>
-            <div class='titulo-principal'>PORTAL GREEN EXPRESS</div>
-            <div class='subtitulo'>PARCEIRAS GREEN EXPRESS</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Header centralizado
+        renderizar_header_centralizado()
         
         # Pódio visível antes do login
         renderizar_podio(df_vendas)
@@ -402,20 +407,8 @@ def main():
     else:
         cupom_ativo = st.session_state['usuario_atual']
         
-        # Header com logo
-        col_logo, col_texto = st.columns([1, 5])
-        with col_logo:
-            try:
-                st.image("logo.png", width=80)
-            except:
-                st.markdown("💚")
-        with col_texto:
-            st.markdown("""
-            <div class='titulo-principal' style='font-size: 28px; text-align: left;'>
-                Portal Green Express
-            </div>
-            <div class='subtitulo' style='text-align: left;'>Área Exclusiva de Parceiras</div>
-            """, unsafe_allow_html=True)
+        # Header centralizado (logado)
+        renderizar_header_centralizado()
         
         # Botão de logout
         st.markdown("<div class='logout-container'>", unsafe_allow_html=True)
@@ -427,22 +420,30 @@ def main():
         # Pódio
         renderizar_podio(df_vendas)
 
-        # Processamento de dados
-        coluna_codigo = 'código' if 'código' in df_vendas.columns else 'Codigo'
+        # Processamento de dados - CORRIGIDO
+        coluna_codigo = 'código' if 'código' in df_vendas.columns else 'codigo'
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
-        vendas_totais_periodo = df_vendas['valor_total_das_vendas'].sum()
 
         if not dados_vendas.empty:
-            vendas = dados_vendas['valor_total_das_vendas'].values[0]
-            qtd = dados_vendas['quantidade'].values[0]
-            comissao = vendas * (PORCENTAGEM_COMISSAO_PADRAO / 100)
+            # Vendas no mês (coluna C)
+            vendas_mes = dados_vendas['valor_de_vendas_no_mes'].values[0]
+            
+            # Quantidade de vendas (coluna B)
+            qtd = dados_vendas['quantidade_de_vendas'].values[0]
+            
+            # Comissão calculada sobre vendas no mês
+            comissao = vendas_mes * (PORCENTAGEM_COMISSAO_PADRAO / 100)
+            
+            # Vendas período total (coluna D) - INDIVIDUAL da influencer
+            vendas_totais = dados_vendas['valor_total_de_vendas'].values[0]
         else:
-            vendas = 0
+            vendas_mes = 0
             qtd = 0
             comissao = 0
+            vendas_totais = 0
 
         # Renderizar resultados
-        renderizar_resultados(vendas, qtd, comissao, vendas_totais_periodo)
+        renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais)
 
         # Link de afiliação (buscar do CSV se existir)
         link_afiliacao = ""
