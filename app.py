@@ -256,13 +256,17 @@ def renderizar_header_centralizado():
     """Header centralizado com logo e texto"""
     st.markdown("<div class='header-container'>", unsafe_allow_html=True)
     
-    # Tenta carregar a logo
+    # Tenta carregar a logo SVG
     try:
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.image("logo.png", use_container_width=True)
+            st.image("logo.svg", use_container_width=True)
     except:
-        st.markdown("💚", unsafe_allow_html=True)
+        # Fallback: tenta PNG se SVG não existir
+        try:
+            st.image("logo.png", use_container_width=True)
+        except:
+            st.markdown("💚", unsafe_allow_html=True)
     
     st.markdown("<div class='subtitulo'>Portal de Parceiras Green Express</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
