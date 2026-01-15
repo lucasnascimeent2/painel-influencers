@@ -234,7 +234,13 @@ PORCENTAGEM_COMISSAO_PADRAO = 20.0
 @st.cache_data
 def carregar_dados():
     try:
-        df_vendas = pd.read_csv(ARQUIVO_VENDAS)
+        # Tenta ler com separador padrão (vírgula) e decimal brasileiro (vírgula)
+        df_vendas = pd.read_csv(ARQUIVO_VENDAS, decimal=',', sep=';', thousands='.')
+        
+        # Se falhar, tenta formato americano (ponto como decimal)
+        if df_vendas.empty or len(df_vendas.columns) < 4:
+            df_vendas = pd.read_csv(ARQUIVO_VENDAS)
+        
         df_usuarios = pd.read_csv(ARQUIVO_USUARIOS)
         df_usuarios['cupom'] = df_usuarios['cupom'].astype(str).str.upper().str.strip()
         df_usuarios['senha'] = df_usuarios['senha'].astype(str).str.strip()
