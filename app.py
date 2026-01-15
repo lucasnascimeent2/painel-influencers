@@ -73,7 +73,7 @@ def local_css():
 # 3. CONFIGURAÇÕES DO SISTEMA
 # --------------------------------------------------------------------------
 ARQUIVO_VENDAS = 'vendas.csv'
-ARQUIVO_USUARIOS = 'usuarios.csv'
+ARQUIVO_USUARIOS = 'usuario.csv'
 PORCENTAGEM_COMISSAO_PADRAO = 20.0 
 
 # --------------------------------------------------------------------------
@@ -202,3 +202,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
