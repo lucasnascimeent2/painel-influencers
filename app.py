@@ -231,7 +231,7 @@ ARQUIVO_VENDAS = 'vendas.csv'
 ARQUIVO_USUARIOS = 'usuario.csv'
 PORCENTAGEM_COMISSAO_PADRAO = 20.0
 
-@st.cache_data
+@st.cache_data(ttl=60)  # Cache expira a cada 60 segundos
 def carregar_dados():
     try:
         # Tenta ler com separador padrão (vírgula) e decimal brasileiro (vírgula)
