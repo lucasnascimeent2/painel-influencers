@@ -414,20 +414,17 @@ def main():
         # Header centralizado (logado)
         renderizar_header_centralizado()
         
-        # Botão de logout (removido quadrado verde)
+        # Botão de logout - CORRIGIDO
         col_space, col_btn = st.columns([4, 1])
-        with col_btn:
         with col_btn:
             if st.button("🚪 Sair", type="secondary"):
                 st.session_state['logado'] = False
                 st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
 
         # Pódio
         renderizar_podio(df_vendas)
 
-        # Processamento de dados - CORRIGIDO
-        # Detecta nomes das colunas automaticamente
+        # Processamento de dados
         colunas = df_vendas.columns.tolist()
         coluna_codigo = colunas[0]  # Coluna A
         coluna_qtd = colunas[1]     # Coluna B
@@ -437,16 +434,9 @@ def main():
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
 
         if not dados_vendas.empty:
-            # Vendas no mês (coluna C)
             vendas_mes = dados_vendas[coluna_valor_mes].values[0]
-            
-            # Quantidade de vendas (coluna B)
             qtd = dados_vendas[coluna_qtd].values[0]
-            
-            # Comissão calculada sobre vendas no mês
             comissao = vendas_mes * (PORCENTAGEM_COMISSAO_PADRAO / 100)
-            
-            # Vendas período total (coluna D) - INDIVIDUAL da influencer
             vendas_totais = dados_vendas[coluna_valor_total].values[0]
         else:
             vendas_mes = 0
@@ -457,7 +447,7 @@ def main():
         # Renderizar resultados
         renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais)
 
-        # Link de afiliação (buscar do CSV se existir)
+        # Link de afiliação
         link_afiliacao = ""
         usuario_info = df_usuarios[df_usuarios['cupom'] == cupom_ativo]
         if not usuario_info.empty and 'link' in df_usuarios.columns:
