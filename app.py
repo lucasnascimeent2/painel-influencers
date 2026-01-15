@@ -310,7 +310,7 @@ def renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais):
         st.markdown(f"""
         <div class='metric-box'>
             <div class='metric-label'>Vendas Totais no mês</div>
-            <div class='metric-value'>R$ {vendas_mes:,.2f}</div>
+            <div class='metric-value'>R$ {float(vendas_mes):,.2f}</div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -318,21 +318,21 @@ def renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais):
         st.markdown(f"""
         <div class='metric-box'>
             <div class='metric-label'>Quantidade de vendas</div>
-            <div class='metric-value'>{qtd}</div>
+            <div class='metric-value'>{int(qtd)}</div>
         </div>
         """, unsafe_allow_html=True)
     
     st.markdown(f"""
     <div class='metric-box'>
         <div class='metric-label'>Sua Comissão (20%)</div>
-        <div class='metric-value-green'>R$ {comissao:,.2f}</div>
+        <div class='metric-value-green'>R$ {float(comissao):,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown(f"""
     <div class='metric-box' style='border-color: #666;'>
         <div class='metric-label'>Vendas período total</div>
-        <div class='metric-value'>R$ {vendas_totais:,.2f}</div>
+        <div class='metric-value'>R$ {float(vendas_totais):,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -445,6 +445,10 @@ def main():
             
             # Vendas período total = coluna D (valor_total_de_vendas)
             vendas_totais = dados_vendas[coluna_valor_total].values[0]
+            
+            # DEBUG: Mostra os valores lidos (remover depois)
+            st.write(f"DEBUG - Coluna D ({coluna_valor_total}): {vendas_totais}")
+            st.write(f"DEBUG - Dados da linha completa: {dados_vendas.iloc[0].to_dict()}")
         else:
             vendas_mes = 0
             qtd = 0
