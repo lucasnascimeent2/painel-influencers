@@ -1,22 +1,23 @@
 import streamlit as st
 import pandas as pd
 
-# Configuração da página
+# Configuração da página (DEVE ser a primeira linha de comando streamlit)
 st.set_page_config(page_title="Portal do Influencer", layout="centered")
 
 # --- CONFIGURAÇÕES ---
 ARQUIVO_DADOS = 'vendas.csv'
-PORCENTAGEM_COMISSAO_PADRAO = 20.0  # Defina aqui a comissão padrão (ex: 10%)
+PORCENTAGEM_COMISSAO_PADRAO = 20.0 
 
 # Função para carregar dados
 @st.cache_data
 def carregar_dados():
     try:
-        # Carrega o CSV. O separador parece ser vírgula baseado na análise prévia.
         df = pd.read_csv(ARQUIVO_DADOS)
         return df
     except FileNotFoundError:
-        st.error(f"Arquivo '{ARQUIVO_DADOS}' não encontrado. Verifique se ele está na mesma pasta do script.")
+        return None
+    except Exception as e:
+        st.error(f"Erro ao ler o arquivo: {e}")
         return None
 
 def main():
@@ -25,49 +26,56 @@ def main():
 
     df = carregar_dados()
 
-    if df is not None:
-        # Área de Login (Simples)
+    if df is None:
+        st.error(f"O arquivo '{ARQUIVO_DADOS}' não foi encontrado.")
+        st.warning("DICA: Verifique se o arquivo da planilha está na mesma pasta e se o nome é exatamente 'vendas.csv' (tudo minúsculo).")
+    else:
+        # Área de Login
         st.subheader("Acesso aos Resultados")
-        cupom_input = st.text_input("Digite seu Cupom de Parceiro (ex: SEUNOME10):").strip().upper()
+        cupom_input = st.text_input("Digite seu Cupom de Parceiro:").strip().upper()
 
         if cupom_input:
-            # Filtra os dados pelo cupom
-            dados_influencer = df[df['código'] == cupom_input]
+            # Tenta encontrar a coluna correta (flexibilidade para maiúsculas/minúsculas)
+            coluna_codigo = 'código' # Padrão do seu arquivo
+            
+            # Verificação de segurança caso a coluna mude de nome
+            if 'código' not in df.columns and 'Codigo' in df.columns:
+                 coluna_codigo = 'Codigo'
 
-            if not dados_influencer.empty:
-                # Extrai os valores
-                vendas_totais = dados_influencer['valor_total_das_vendas'].values[0]
-                quantidade = dados_influencer['quantidade'].values[0]
-                
-                # Cálculo da comissão
-                comissao = vendas_totais * (PORCENTAGEM_COMISSAO_PADRAO / 100)
+            if coluna_codigo in df.columns:
+                dados_influencer = df[df[coluna_codigo] == cupom_input]
 
-                st.success(f"Dados encontrados para: **{cupom_input}**")
-                
-                # Exibe métricas em cartões
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    st.metric("Vendas Totais", f"R$ {vendas_totais:,.2f}")
-                with col2:
-                    st.metric("Quantidade Vendida", f"{quantidade}")
-                with col3:
-                    st.metric("Sua Comissão (estimada)", f"R$ {comissao:,.2f}")
-                
-                st.info(f"Parabéns! Seu cupom representa {dados_influencer['porcentagem_das_vendas'].values[0]}% das vendas totais da loja.")
+                if not dados_influencer.empty:
+                    vendas_totais = dados_influencer['valor_total_das_vendas'].values[0]
+                    quantidade = dados_influencer['quantidade'].values[0]
+                    porcentagem = dados_influencer['porcentagem_das_vendas'].values[0]
+                    
+                    comissao = vendas_totais * (PORCENTAGEM_COMISSAO_PADRAO / 100)
 
+                    st.success(f"Dados encontrados para: **{cupom_input}**")
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Vendas Totais", f"R$ {vendas_totais:,.2f}")
+                    with col2:
+                        st.metric("Quantidade", f"{quantidade}")
+                    with col3:
+                        st.metric("Sua Comissão (20%)", f"R$ {comissao:,.2f}")
+                    
+                    st.info(f"Seu cupom representa {porcentagem}% das vendas totais.")
+                else:
+                    st.warning("Cupom não encontrado nas vendas deste período.")
             else:
-                st.warning("Cupom não encontrado ou sem vendas registradas neste período.")
+                st.error("Erro na Planilha: A coluna 'código' não foi encontrada.")
 
-    # Rodapé / Área Admin (Opcional)
+    # Área Admin
     st.markdown("---")
-    with st.expander("Área Administrativa (Apenas Interno)"):
+    with st.expander("Área Administrativa"):
         senha = st.text_input("Senha Admin", type="password")
-        if senha == "admin123": # Você pode mudar essa senha
-            st.write("Visão Geral de Todas as Vendas:")
-            st.dataframe(df)
-            st.write(f"Total Geral Vendido: R$ {df['valor_total_das_vendas'].sum():,.2f}")
+        if senha == "admin123":
+            if df is not None:
+                st.write(df)
+                st.write(f"Total Geral: R$ {df['valor_total_das_vendas'].sum():,.2f}")
 
 if __name__ == "__main__":
-
     main()
