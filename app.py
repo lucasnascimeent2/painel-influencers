@@ -4,10 +4,78 @@ import pandas as pd
 # --------------------------------------------------------------------------
 # 1. CONFIGURAÇÃO INICIAL
 # --------------------------------------------------------------------------
-st.set_page_config(page_title="Portal de Parceiras Green Express 💚", page_icon="💚", layout="centered")
+st.set_page_config(page_title="Portal Green Express", page_icon="💚", layout="wide") 
+# Mudei layout para "wide" para caber tudo na mesma linha melhor
 
 # --------------------------------------------------------------------------
-# 2. CARREGAR DADOS
+# 2. DESIGN E PERSONALIZAÇÃO (CSS AVANÇADO)
+# --------------------------------------------------------------------------
+def local_css():
+    st.markdown("""
+        <style>
+        /* Fundo e cores gerais */
+        .stApp {
+            background-color: #0e1117 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Ajuste do Título para ficar alinhado com a Logo */
+        .titulo-principal {
+            font-family: 'Helvetica', sans-serif;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 32px;
+            padding-top: 10px; /* Ajuste fino vertical */
+            margin-bottom: 0px;
+        }
+        .subtitulo {
+            color: #00cc66;
+            font-size: 18px;
+            font-weight: 400;
+            margin-top: -5px;
+        }
+
+        /* --- ALINHAMENTO DO FORMULÁRIO DE LOGIN --- */
+        /* Isso faz o botão descer um pouco para alinhar com as caixas de texto */
+        div[data-testid="stForm"] .stButton {
+            margin-top: 28px;
+        }
+        
+        /* Estilo dos Inputs */
+        div[data-testid="stTextInput"] input {
+            background-color: #262730 !important;
+            color: #ffffff !important;
+            border: 1px solid #4b5563 !important;
+        }
+        
+        /* Estilo do Botão */
+        button[kind="primary"] {
+            background-color: #00cc66 !important;
+            border: none !important;
+            color: #000000 !important;
+            font-weight: bold !important;
+            width: 100%; /* Botão preenche a coluna */
+        }
+        button[kind="primary"]:hover {
+            background-color: #00e673 !important;
+        }
+
+        /* Cartões de Métricas */
+        div[data-testid="stMetric"] {
+            background-color: #1f2937 !important;
+            border: 1px solid #00cc66 !important;
+            border-radius: 10px !important;
+            padding: 10px !important;
+        }
+        div[data-testid="stMetricValue"] {
+            font-size: 24px !important;
+            color: #ffffff !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+# --------------------------------------------------------------------------
+# 3. CARREGAMENTO DE DADOS
 # --------------------------------------------------------------------------
 ARQUIVO_VENDAS = 'vendas.csv'
 ARQUIVO_USUARIOS = 'usuario.csv'
@@ -18,66 +86,62 @@ def carregar_dados():
     try:
         df_vendas = pd.read_csv(ARQUIVO_VENDAS)
         df_usuarios = pd.read_csv(ARQUIVO_USUARIOS)
-        
-        # Tratamento de dados (padronização)
         df_usuarios['cupom'] = df_usuarios['cupom'].astype(str).str.upper().str.strip()
         df_usuarios['senha'] = df_usuarios['senha'].astype(str).str.strip()
-        
         return df_vendas, df_usuarios
-    except Exception as e:
+    except Exception:
         return None, None
 
 # --------------------------------------------------------------------------
-# 3. PROGRAMA PRINCIPAL
+# 4. PROGRAMA PRINCIPAL
 # --------------------------------------------------------------------------
 def main():
+    local_css()
     
-    # --- LOGO E TÍTULO ---
-    # Colunas para centralizar a imagem e o texto
-    col_esq, col_meio, col_dir = st.columns([1, 2, 1])
-    with col_meio:
+    # --- CABEÇALHO EM UMA LINHA (LOGO + TEXTO) ---
+    # Coluna 1 (Pequena) para Logo | Coluna 2 (Grande) para Texto
+    col_logo, col_texto = st.columns([1, 6])
+    
+    with col_logo:
         try:
-            # Carrega a logo
-            st.image("logo.png", use_container_width=True)
+            st.image("logo.png", width=100) # Ajuste a largura conforme sua logo
         except:
-            # Caso a imagem falhe, mostra um ícone
-            st.header("💚 Green Express")
-        
-        # Título escrito abaixo da logo (como solicitado)
-        st.markdown(
-            """
-            <h3 style='text-align: center; color: #ffffff; margin-top: -8px;'>
-                Portal de Parceiras Green Express 💚
-            </h3>
-            """, 
-            unsafe_allow_html=True
-        )
+            st.header("💚")
+
+    with col_texto:
+        st.markdown("""
+            <div class='titulo-principal'>Portal Green Express</div>
+            <div class='subtitulo'>Área Exclusiva de Parceiras</div>
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
 
     df_vendas, df_usuarios = carregar_dados()
 
-    # Verifica se arquivos existem
     if df_vendas is None or df_usuarios is None:
-        st.error("⚠️ Erro de Sistema")
-        st.warning("Verifique se 'vendas.csv' e 'usuario.csv' estão no GitHub.")
+        st.error("⚠️ Erro: Arquivos 'vendas.csv' ou 'usuario.csv' não encontrados.")
         st.stop()
 
-    # --- LÓGICA DE LOGIN ---
+    # --- LÓGICA DE ESTADO ---
     if 'logado' not in st.session_state:
         st.session_state['logado'] = False
         st.session_state['usuario_atual'] = ''
 
+    # --- TELA DE LOGIN (TUDO EM UMA LINHA) ---
     if not st.session_state['logado']:
-        st.subheader("Acesso Restrito")
         
         with st.form("login_form"):
-            st.write("Entre com suas credenciais:")
-            cupom_input = st.text_input("Seu Cupom").strip().upper()
-            senha_input = st.text_input("Sua Senha", type="password").strip()
+            st.write("Acesso Rápido:")
+            # Cria 3 colunas: Cupom | Senha | Botão
+            c1, c2, c3 = st.columns([3, 3, 2])
             
-            # Botão de entrar
-            botao_entrar = st.form_submit_button("Entrar no Painel", type="primary")
+            with c1:
+                cupom_input = st.text_input("Cupom").strip().upper()
+            with c2:
+                senha_input = st.text_input("Senha", type="password").strip()
+            with c3:
+                # O CSS lá em cima alinha este botão com as caixas de texto
+                botao_entrar = st.form_submit_button("Acessar", type="primary")
 
         if botao_entrar:
             usuario_valido = df_usuarios[
@@ -90,52 +154,49 @@ def main():
                 st.session_state['usuario_atual'] = cupom_input
                 st.rerun()
             else:
-                st.error("❌ Dados incorretos. Tente novamente.")
-    
-    # --- PAINEL DA PARCEIRA (LOGADO) ---
+                st.error("Dados inválidos.")
+
+    # --- PAINEL LOGADO (RESULTADOS) ---
     else:
         cupom_ativo = st.session_state['usuario_atual']
         
-        # Barra de boas-vindas
-        col1, col2 = st.columns([3, 1])
-        col1.success(f"Olá, **{cupom_ativo}**!")
-        if col2.button("Sair"):
+        # Barra superior alinhada
+        c_topo1, c_topo2 = st.columns([6, 1])
+        c_topo1.success(f"Logada como: **{cupom_ativo}**")
+        if c_topo2.button("Sair"):
             st.session_state['logado'] = False
             st.rerun()
 
-        # Busca dados de vendas
+        # Processamento
         coluna_codigo = 'código' 
         if 'código' not in df_vendas.columns and 'Codigo' in df_vendas.columns:
             coluna_codigo = 'Codigo'
 
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
 
-        st.markdown("### Seus Resultados")
+        st.markdown("### 📊 Seus Resultados")
         
         if not dados_vendas.empty:
             vendas = dados_vendas['valor_total_das_vendas'].values[0]
             qtd = dados_vendas['quantidade'].values[0]
             comissao = vendas * (PORCENTAGEM_COMISSAO_PADRAO / 100)
 
-            # Métricas
-            c1, c2, c3 = st.columns(3)
-            c1.metric("Vendas Totais", f"R$ {vendas:,.2f}")
-            c2.metric("Quantidade", f"{qtd}")
-            c3.metric("Comissão (20%)", f"R$ {comissao:,.2f}")
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Vendas Totais", f"R$ {vendas:,.2f}")
+            m2.metric("Quantidade", f"{qtd}")
+            m3.metric("Comissão (20%)", f"R$ {comissao:,.2f}")
         else:
-            st.info("Ainda não há vendas registradas para este período.")
-            c1, c2, c3 = st.columns(3)
-            c1.metric("Vendas", "R$ 0,00")
-            c2.metric("Qtd", "0")
-            c3.metric("Comissão", "R$ 0,00")
+            st.info("Sem vendas registradas no momento.")
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Vendas", "R$ 0,00")
+            m2.metric("Qtd", "0")
+            m3.metric("Comissão", "R$ 0,00")
 
-    # Área Admin Oculta
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    # Admin
+    st.markdown("<br>", unsafe_allow_html=True)
     with st.expander("Admin"):
-        if st.text_input("Senha Admin", type="password") == "admin123":
+        if st.text_input("Senha") == "admin123":
             st.dataframe(df_vendas)
 
 if __name__ == "__main__":
     main()
-
-
