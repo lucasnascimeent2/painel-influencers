@@ -1,3 +1,371 @@
+import streamlit as st
+import pandas as pd
+
+# --------------------------------------------------------------------------
+# 1. CONFIGURAÇÃO INICIAL
+# --------------------------------------------------------------------------
+st.set_page_config(page_title="Portal Green Express", page_icon="💚", layout="centered")
+
+# --------------------------------------------------------------------------
+# 2. DESIGN E PERSONALIZAÇÃO (CSS AVANÇADO)
+# --------------------------------------------------------------------------
+def local_css():
+    st.markdown("""
+        <style>
+        /* Fundo e cores gerais */
+        .stApp {
+            background-color: #0a0a0a !important;
+            color: #ffffff !important;
+        }
+        
+        /* Logo e Título */
+        .header-container {
+            text-align: center;
+            padding: 20px 0 15px 0;
+        }
+        .logo-img {
+            max-width: 150px;
+            margin: 0 auto;
+            display: block;
+        }
+        .subtitulo {
+            color: #00cc66;
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* Pódio de Ranking - VERTICAL */
+        .podium-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin: 15px 0;
+            border: 1px solid #00cc66;
+        }
+        .podium-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .podium-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .podium-card {
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 15px 20px;
+            text-align: center;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .podium-card-1 { border-color: #FFD700; }
+        .podium-card-2 { border-color: #C0C0C0; }
+        .podium-card-3 { border-color: #CD7F32; }
+        
+        .podium-position {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 0;
+            min-width: 50px;
+        }
+        .podium-cupom {
+            color: #00cc66;
+            font-weight: 600;
+            font-size: 16px;
+            flex: 1;
+            text-align: center;
+        }
+        .podium-value {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            min-width: 120px;
+            text-align: right;
+        }
+
+        /* Card de Resultados */
+        .result-card {
+            background: linear-gradient(135deg, #1f1f1f 0%, #151515 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #333;
+        }
+        .result-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .metric-box {
+            background: #0a0a0a;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin: 8px 0;
+            border: 1px solid #00cc66;
+        }
+        .metric-label {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .metric-value {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .metric-value-green {
+            color: #00cc66;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* Seção de Dados Pessoais */
+        .personal-data {
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #333;
+        }
+        .data-title {
+            color: #00cc66;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .data-item {
+            background: #0a0a0a;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #333;
+        }
+        .data-label {
+            color: #888;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        .data-value {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        /* Formulário de Login */
+        .login-container {
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 25px;
+            background: transparent;
+            border-radius: 15px;
+            border: none;
+        }
+        
+        /* Inputs */
+        div[data-testid="stTextInput"] input {
+            background-color: #0a0a0a !important;
+            color: #ffffff !important;
+            border: 1px solid #333 !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+        }
+        div[data-testid="stTextInput"] input:focus {
+            border-color: #00cc66 !important;
+        }
+        
+        /* Botões */
+        button[kind="primary"] {
+            background-color: #00cc66 !important;
+            border: none !important;
+            color: #000000 !important;
+            font-weight: bold !important;
+            width: 100%;
+            padding: 12px !important;
+            border-radius: 8px !important;
+            font-size: 16px !important;
+        }
+        button[kind="primary"]:hover {
+            background-color: #00e673 !important;
+            transform: scale(1.02);
+        }
+        button[kind="secondary"] {
+            background-color: #2a2a2a !important;
+            color: #ffffff !important;
+            border: 1px solid #00cc66 !important;
+        }
+
+        /* Logout */
+        .logout-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        /* Ocultar elementos do Streamlit */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        </style>
+        """, unsafe_allow_html=True)
+
+# --------------------------------------------------------------------------
+# 3. CARREGAMENTO DE DADOS
+# --------------------------------------------------------------------------
+ARQUIVO_VENDAS = 'vendas.csv'
+ARQUIVO_USUARIOS = 'usuario.csv'
+PORCENTAGEM_COMISSAO_PADRAO = 20.0
+
+@st.cache_data
+def carregar_dados():
+    try:
+        # Tenta ler com separador padrão (vírgula) e decimal brasileiro (vírgula)
+        df_vendas = pd.read_csv(ARQUIVO_VENDAS, decimal=',', sep=';', thousands='.')
+        
+        # Se falhar, tenta formato americano (ponto como decimal)
+        if df_vendas.empty or len(df_vendas.columns) < 4:
+            df_vendas = pd.read_csv(ARQUIVO_VENDAS)
+        
+        df_usuarios = pd.read_csv(ARQUIVO_USUARIOS)
+        df_usuarios['cupom'] = df_usuarios['cupom'].astype(str).str.upper().str.strip()
+        df_usuarios['senha'] = df_usuarios['senha'].astype(str).str.strip()
+        return df_vendas, df_usuarios
+    except Exception as e:
+        st.error(f"Erro ao carregar dados: {e}")
+        return None, None
+
+# --------------------------------------------------------------------------
+# 4. COMPONENTES VISUAIS
+# --------------------------------------------------------------------------
+def renderizar_header_centralizado():
+    """Header centralizado com logo e texto"""
+    st.markdown("<div class='header-container'>", unsafe_allow_html=True)
+    
+    # Tenta carregar a logo
+    try:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image("logo.png", use_container_width=True)
+    except:
+        st.markdown("💚", unsafe_allow_html=True)
+    
+    st.markdown("<div class='subtitulo'>Portal de Parceiras Green Express</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+def renderizar_podio(df_vendas):
+    """Renderiza o pódio com top 3 parceiras - ORDEM VERTICAL"""
+    # Detecta nomes das colunas automaticamente
+    colunas = df_vendas.columns.tolist()
+    coluna_codigo = colunas[0]  # Primeira coluna = código/cupom
+    coluna_valor_mes = colunas[2]  # Terceira coluna = valor vendas no mês
+    
+    # Pega top 3
+    top3 = df_vendas.nlargest(3, coluna_valor_mes).head(3)
+    
+    if len(top3) == 0:
+        st.info("Ainda não há dados de vendas para exibir o ranking.")
+        return
+    
+    st.markdown("<div class='podium-container'>", unsafe_allow_html=True)
+    st.markdown("<div class='podium-title'>🏆 RANKING DO MÊS</div>", unsafe_allow_html=True)
+    st.markdown("<div class='podium-grid'>", unsafe_allow_html=True)
+    
+    # Ordem vertical: 1º, 2º, 3º
+    medal_colors = {0: '#FFD700', 1: '#C0C0C0', 2: '#CD7F32'}
+    medal_numbers = {0: '1', 1: '2', 2: '3'}
+    
+    for idx in range(min(3, len(top3))):
+        row = top3.iloc[idx]
+        cupom = row[coluna_codigo]
+        valor = row[coluna_valor_mes]
+        
+        card_class = f"podium-card-{medal_numbers[idx]}"
+        
+        st.markdown(f"""
+        <div class='podium-card {card_class}'>
+            <div class='podium-position' style='color: {medal_colors[idx]};'>{medal_numbers[idx]}</div>
+            <div class='podium-cupom'>{cupom}</div>
+            <div class='podium-value'>R$ {valor:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("</div></div>", unsafe_allow_html=True)
+
+def renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais):
+    """Renderiza os cards de resultados"""
+    st.markdown("<div class='result-card'>", unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown(f"""
+        <div class='metric-box'>
+            <div class='metric-label'>Vendas Totais no mês</div>
+            <div class='metric-value'>R$ {float(vendas_mes):,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown(f"""
+        <div class='metric-box'>
+            <div class='metric-label'>Quantidade de vendas</div>
+            <div class='metric-value'>{int(qtd)}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class='metric-box'>
+        <div class='metric-label'>Sua Comissão (20%)</div>
+        <div class='metric-value-green'>R$ {float(comissao):,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class='metric-box' style='border-color: #666;'>
+        <div class='metric-label'>Vendas período total</div>
+        <div class='metric-value'>R$ {float(vendas_totais):,.2f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+
+def renderizar_dados_pessoais(cupom, link_afiliacao=""):
+    """Renderiza a seção de dados pessoais"""
+    st.markdown("<div class='personal-data'>", unsafe_allow_html=True)
+    st.markdown("<div class='data-title'>📋 Seus Dados</div>", unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class='data-item'>
+        <div class='data-label'>Cupom</div>
+        <div class='data-value'>{cupom}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if link_afiliacao:
+        st.markdown(f"""
+        <div class='data-item'>
+            <div class='data-label'>Link de afiliação</div>
+            <div class='data-value'>{link_afiliacao}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # --------------------------------------------------------------------------
 # 5. PROGRAMA PRINCIPAL
 # --------------------------------------------------------------------------
@@ -62,20 +430,24 @@ def main():
         # Pódio
         renderizar_podio(df_vendas)
 
-        # Processamento de dados - CORREÇÃO AQUI
+        # Processamento de dados
         colunas = df_vendas.columns.tolist()
         coluna_codigo = colunas[0]  # Coluna A - código
         coluna_qtd = colunas[1]     # Coluna B - quantidade
         coluna_vendas_mes = colunas[2]  # Coluna C - vendas_mes
         
-        # IMPORTANTE: A coluna D (valor_total_de_vendas) parece não estar correta
-        # Vamos calcular o total REAL somando todas as vendas do mês
-        vendas_totais_reais = df_vendas[coluna_vendas_mes].sum()
+        # Tenta pegar coluna E (índice 4), se não existir usa D (índice 3)
+        if len(colunas) > 4:
+            coluna_valor_total = colunas[4]  # Coluna E
+        elif len(colunas) > 3:
+            coluna_valor_total = colunas[3]  # Coluna D
+        else:
+            coluna_valor_total = colunas[2]  # Fallback para C
         
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
 
         if not dados_vendas.empty:
-            # Vendas Totais no mês = coluna C (vendas_mes do vendedor)
+            # Vendas Totais no mês = coluna C (vendas_mes)
             vendas_mes = dados_vendas[coluna_vendas_mes].values[0]
             
             # Quantidade de vendas = coluna B
@@ -84,9 +456,8 @@ def main():
             # Comissão calculada sobre vendas do mês
             comissao = vendas_mes * (PORCENTAGEM_COMISSAO_PADRAO / 100)
             
-            # Vendas período total = SOMA de TODAS as vendas do mês (R$ 15.000,00)
-            # Usamos o valor real calculado, não a coluna D
-            vendas_totais = vendas_totais_reais
+            # Vendas período total = última coluna disponível
+            vendas_totais = dados_vendas[coluna_valor_total].values[0]
         else:
             vendas_mes = 0
             qtd = 0
@@ -109,15 +480,8 @@ def main():
             senha_admin = st.text_input("Senha Admin", type="password", key="admin_pass")
             if senha_admin == "admin123":
                 st.success("✅ Acesso admin concedido")
-                
-                # Mostrar estatísticas úteis para debug
-                st.subheader("📊 Estatísticas do Sistema")
-                st.write(f"Total de vendedores: {len(df_vendas)}")
-                st.write(f"Vendas totais do mês (soma): R$ {vendas_totais_reais:,.2f}")
-                st.write(f"Seu cupom: {cupom_ativo}")
-                
-                st.subheader("📁 Dados de Vendas")
                 st.dataframe(df_vendas)
-                
-                st.subheader("👥 Dados de Usuários")
                 st.dataframe(df_usuarios)
+
+if __name__ == "__main__":
+    main()
