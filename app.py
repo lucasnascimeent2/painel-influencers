@@ -4,7 +4,7 @@ import pandas as pd
 # --------------------------------------------------------------------------
 # 1. CONFIGURAÇÃO INICIAL
 # --------------------------------------------------------------------------
-st.set_page_config(page_title="Portal Green Express", page_icon="💚", layout="centered")
+st.set_page_config(page_title="Portal de Parceiras Green Express", page_icon="💚", layout="centered")
 
 # --------------------------------------------------------------------------
 # 2. CARREGAR DADOS
@@ -19,7 +19,7 @@ def carregar_dados():
         df_vendas = pd.read_csv(ARQUIVO_VENDAS)
         df_usuarios = pd.read_csv(ARQUIVO_USUARIOS)
         
-        # Tratamento de dados
+        # Tratamento de dados (padronização)
         df_usuarios['cupom'] = df_usuarios['cupom'].astype(str).str.upper().str.strip()
         df_usuarios['senha'] = df_usuarios['senha'].astype(str).str.strip()
         
@@ -32,26 +32,36 @@ def carregar_dados():
 # --------------------------------------------------------------------------
 def main():
     
-    # --- EXIBIÇÃO DA LOGO (NOVA PARTE) ---
-    # Usamos colunas para centralizar a imagem
+    # --- LOGO E TÍTULO ---
+    # Colunas para centralizar a imagem e o texto
     col_esq, col_meio, col_dir = st.columns([1, 2, 1])
     with col_meio:
         try:
-            # Tenta carregar a logo.png se ela estiver no GitHub
+            # Carrega a logo
             st.image("logo.png", use_container_width=True)
         except:
-            # Se não tiver logo, mostra apenas o título escrito
-            st.title("💚 Green Express")
+            # Caso a imagem falhe, mostra um ícone
+            st.header("💚 Green Express")
+        
+        # Título escrito abaixo da logo (como solicitado)
+        st.markdown(
+            """
+            <h3 style='text-align: center; color: #ffffff; margin-top: -10px;'>
+                Portal de Parceiras Green Express
+            </h3>
+            """, 
+            unsafe_allow_html=True
+        )
 
     st.markdown("---")
 
     df_vendas, df_usuarios = carregar_dados()
 
-    # Verifica se os arquivos carregaram (se não, mostra erro amigável)
+    # Verifica se arquivos existem
     if df_vendas is None or df_usuarios is None:
         st.error("⚠️ Erro de Sistema")
-        st.warning("Verifique se os arquivos 'vendas.csv' e 'usuario.csv' estão no GitHub.")
-        st.stop() # Para a execução aqui
+        st.warning("Verifique se 'vendas.csv' e 'usuario.csv' estão no GitHub.")
+        st.stop()
 
     # --- LÓGICA DE LOGIN ---
     if 'logado' not in st.session_state:
@@ -62,10 +72,11 @@ def main():
         st.subheader("Acesso Restrito")
         
         with st.form("login_form"):
-            st.write("Entre com suas credenciais de parceiro:")
+            st.write("Entre com suas credenciais:")
             cupom_input = st.text_input("Seu Cupom").strip().upper()
             senha_input = st.text_input("Sua Senha", type="password").strip()
             
+            # Botão de entrar
             botao_entrar = st.form_submit_button("Entrar no Painel", type="primary")
 
         if botao_entrar:
@@ -81,18 +92,18 @@ def main():
             else:
                 st.error("❌ Dados incorretos. Tente novamente.")
     
-    # --- PAINEL (LOGADO) ---
+    # --- PAINEL DA PARCEIRA (LOGADO) ---
     else:
         cupom_ativo = st.session_state['usuario_atual']
         
         # Barra de boas-vindas
         col1, col2 = st.columns([3, 1])
-        col1.success(f"Logado como: **{cupom_ativo}**")
+        col1.success(f"Olá, **{cupom_ativo}**!")
         if col2.button("Sair"):
             st.session_state['logado'] = False
             st.rerun()
 
-        # Busca vendas
+        # Busca dados de vendas
         coluna_codigo = 'código' 
         if 'código' not in df_vendas.columns and 'Codigo' in df_vendas.columns:
             coluna_codigo = 'Codigo'
@@ -106,7 +117,7 @@ def main():
             qtd = dados_vendas['quantidade'].values[0]
             comissao = vendas * (PORCENTAGEM_COMISSAO_PADRAO / 100)
 
-            # Cartões de Métricas (Simples e Eficiente)
+            # Métricas
             c1, c2, c3 = st.columns(3)
             c1.metric("Vendas Totais", f"R$ {vendas:,.2f}")
             c2.metric("Quantidade", f"{qtd}")
@@ -118,10 +129,10 @@ def main():
             c2.metric("Qtd", "0")
             c3.metric("Comissão", "R$ 0,00")
 
-    # Admin Oculto
+    # Área Admin Oculta
     st.markdown("<br><br>", unsafe_allow_html=True)
     with st.expander("Admin"):
-        if st.text_input("Senha") == "admin123":
+        if st.text_input("Senha Admin", type="password") == "admin123":
             st.dataframe(df_vendas)
 
 if __name__ == "__main__":
