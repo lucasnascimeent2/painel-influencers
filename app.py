@@ -21,7 +21,7 @@ def local_css():
         /* Logo e Título */
         .header-container {
             text-align: center;
-            padding: 30px 0 20px 0;
+            padding: 20px 0 15px 0;
         }
         .logo-img {
             max-width: 150px;
@@ -30,68 +30,76 @@ def local_css():
         }
         .subtitulo {
             color: #00cc66;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 400;
-            margin-top: 15px;
+            margin-top: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-align: center;
         }
 
-        /* Pódio de Ranking - TEXTO SIMPLES */
+        /* Pódio de Ranking - VERTICAL */
         .podium-container {
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
             border-radius: 15px;
-            padding: 30px 20px;
-            margin: 20px 0;
+            padding: 25px 20px;
+            margin: 15px 0;
             border: 1px solid #00cc66;
         }
         .podium-title {
             color: #ffffff;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .podium-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
             margin: 0 auto;
         }
         .podium-card {
             background: #2a2a2a;
             border-radius: 10px;
-            padding: 20px 15px;
+            padding: 15px 20px;
             text-align: center;
             border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .podium-card-1 { border-color: #FFD700; }
         .podium-card-2 { border-color: #C0C0C0; }
         .podium-card-3 { border-color: #CD7F32; }
         
         .podium-position {
-            font-size: 48px;
+            font-size: 36px;
             font-weight: 700;
-            margin: 5px 0;
+            margin: 0;
+            min-width: 50px;
         }
         .podium-cupom {
             color: #00cc66;
             font-weight: 600;
-            font-size: 15px;
-            margin: 10px 0 8px 0;
+            font-size: 16px;
+            flex: 1;
+            text-align: center;
         }
         .podium-value {
             color: #ffffff;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 16px;
+            font-weight: 600;
+            min-width: 120px;
+            text-align: right;
         }
 
         /* Card de Resultados */
         .result-card {
             background: linear-gradient(135deg, #1f1f1f 0%, #151515 100%);
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             margin: 15px 0;
             border: 1px solid #333;
         }
@@ -99,30 +107,30 @@ def local_css():
             color: #ffffff;
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
         }
         .metric-box {
             background: #0a0a0a;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            margin: 10px 0;
+            margin: 8px 0;
             border: 1px solid #00cc66;
         }
         .metric-label {
             color: #888;
-            font-size: 14px;
-            margin-bottom: 8px;
+            font-size: 13px;
+            margin-bottom: 6px;
         }
         .metric-value {
             color: #ffffff;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
         }
         .metric-value-green {
             color: #00cc66;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
         }
 
@@ -130,32 +138,32 @@ def local_css():
         .personal-data {
             background: #1a1a1a;
             border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
+            padding: 20px;
+            margin: 15px 0;
             border: 1px solid #333;
         }
         .data-title {
             color: #00cc66;
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
         }
         .data-item {
             background: #0a0a0a;
             border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 8px 0;
             border: 1px solid #333;
         }
         .data-label {
             color: #888;
-            font-size: 12px;
-            margin-bottom: 5px;
+            font-size: 11px;
+            margin-bottom: 4px;
         }
         .data-value {
             color: #ffffff;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             word-break: break-all;
         }
@@ -163,11 +171,11 @@ def local_css():
         /* Formulário de Login */
         .login-container {
             max-width: 500px;
-            margin: 50px auto;
-            padding: 30px;
-            background: #1a1a1a;
+            margin: 30px auto;
+            padding: 25px;
+            background: transparent;
             border-radius: 15px;
-            border: 1px solid #00cc66;
+            border: none;
         }
         
         /* Inputs */
@@ -254,7 +262,7 @@ def renderizar_header_centralizado():
     st.markdown("</div>", unsafe_allow_html=True)
 
 def renderizar_podio(df_vendas):
-    """Renderiza o pódio com top 3 parceiras - APENAS TEXTO"""
+    """Renderiza o pódio com top 3 parceiras - ORDEM VERTICAL"""
     # Detecta nomes das colunas automaticamente
     colunas = df_vendas.columns.tolist()
     coluna_codigo = colunas[0]  # Primeira coluna = código/cupom
@@ -271,36 +279,30 @@ def renderizar_podio(df_vendas):
     st.markdown("<div class='podium-title'>🏆 RANKING DO MÊS</div>", unsafe_allow_html=True)
     st.markdown("<div class='podium-grid'>", unsafe_allow_html=True)
     
-    # Ordem: 2º (esquerda), 1º (centro), 3º (direita)
-    positions = [1, 0, 2]  # Índices: 2º lugar, 1º lugar, 3º lugar
+    # Ordem vertical: 1º, 2º, 3º
     medal_colors = {0: '#FFD700', 1: '#C0C0C0', 2: '#CD7F32'}
     medal_numbers = {0: '1', 1: '2', 2: '3'}
     
-    for idx in positions:
-        if idx < len(top3):
-            row = top3.iloc[idx]
-            cupom = row[coluna_codigo]
-            valor = row[coluna_valor_mes]
-            
-            card_class = f"podium-card-{medal_numbers[idx]}"
-            
-            st.markdown(f"""
-            <div class='podium-card {card_class}'>
-                <div class='podium-position' style='color: {medal_colors[idx]};'>{medal_numbers[idx]}</div>
-                <div class='podium-cupom'>{cupom}</div>
-                <div class='podium-value'>R$ {valor:,.2f}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            # Card vazio se não houver 3 participantes
-            st.markdown("<div class='podium-card' style='opacity: 0.3;'><div class='podium-position'>-</div></div>", unsafe_allow_html=True)
+    for idx in range(min(3, len(top3))):
+        row = top3.iloc[idx]
+        cupom = row[coluna_codigo]
+        valor = row[coluna_valor_mes]
+        
+        card_class = f"podium-card-{medal_numbers[idx]}"
+        
+        st.markdown(f"""
+        <div class='podium-card {card_class}'>
+            <div class='podium-position' style='color: {medal_colors[idx]};'>{medal_numbers[idx]}</div>
+            <div class='podium-cupom'>{cupom}</div>
+            <div class='podium-value'>R$ {valor:,.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div></div>", unsafe_allow_html=True)
 
 def renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais):
     """Renderiza os cards de resultados"""
     st.markdown("<div class='result-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='result-title'>Acesso aos Resultados</div>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -384,7 +386,6 @@ def main():
         renderizar_podio(df_vendas)
         
         st.markdown("<div class='login-container'>", unsafe_allow_html=True)
-        st.markdown("<div class='result-title'>Acesso aos Resultados</div>", unsafe_allow_html=True)
         
         with st.form("login_form"):
             cupom_input = st.text_input("Digite seu Cupom", key="cupom").strip().upper()
@@ -413,11 +414,13 @@ def main():
         # Header centralizado (logado)
         renderizar_header_centralizado()
         
-        # Botão de logout
-        st.markdown("<div class='logout-container'>", unsafe_allow_html=True)
-        if st.button("🚪 Sair", type="secondary"):
-            st.session_state['logado'] = False
-            st.rerun()
+        # Botão de logout (removido quadrado verde)
+        col_space, col_btn = st.columns([4, 1])
+        with col_btn:
+        with col_btn:
+            if st.button("🚪 Sair", type="secondary"):
+                st.session_state['logado'] = False
+                st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
         # Pódio
