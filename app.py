@@ -420,7 +420,7 @@ def main():
         # Header centralizado (logado)
         renderizar_header_centralizado()
         
-        # Botão de logout - CORRIGIDO
+        # Botão de logout
         col_space, col_btn = st.columns([4, 1])
         with col_btn:
             if st.button("🚪 Sair", type="secondary"):
@@ -430,19 +430,14 @@ def main():
         # Pódio
         renderizar_podio(df_vendas)
 
-        # Processamento de dados
+        # Processamento de dados - CORREÇÃO AQUI
         colunas = df_vendas.columns.tolist()
         coluna_codigo = colunas[0]  # Coluna A - código
         coluna_qtd = colunas[1]     # Coluna B - quantidade
         coluna_vendas_mes = colunas[2]  # Coluna C - vendas_mes
         
-        # Tenta pegar coluna E (índice 4), se não existir usa D (índice 3)
-        if len(colunas) > 4:
-            coluna_valor_total = colunas[4]  # Coluna E
-        elif len(colunas) > 3:
-            coluna_valor_total = colunas[3]  # Coluna D
-        else:
-            coluna_valor_total = colunas[2]  # Fallback para C
+        # CORRIGIDO: Sempre usa a coluna D (índice 3) para valor_total_de_vendas
+        coluna_valor_total = colunas[3] if len(colunas) > 3 else colunas[2]
         
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
 
@@ -456,7 +451,7 @@ def main():
             # Comissão calculada sobre vendas do mês
             comissao = vendas_mes * (PORCENTAGEM_COMISSAO_PADRAO / 100)
             
-            # Vendas período total = última coluna disponível
+            # Vendas período total = coluna D (valor_total_de_vendas)
             vendas_totais = dados_vendas[coluna_valor_total].values[0]
         else:
             vendas_mes = 0
