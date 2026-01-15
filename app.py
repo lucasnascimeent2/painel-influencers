@@ -426,17 +426,24 @@ def main():
 
         # Processamento de dados
         colunas = df_vendas.columns.tolist()
-        coluna_codigo = colunas[0]  # Coluna A
-        coluna_qtd = colunas[1]     # Coluna B
-        coluna_valor_mes = colunas[2]  # Coluna C
-        coluna_valor_total = colunas[3] if len(colunas) > 3 else colunas[2]  # Coluna D
+        coluna_codigo = colunas[0]  # Coluna A - código
+        coluna_qtd = colunas[1]     # Coluna B - quantidade
+        coluna_vendas_mes = colunas[2]  # Coluna C - vendas_mes
+        coluna_valor_total = colunas[3] if len(colunas) > 3 else colunas[2]  # Coluna D - valor_total_de_vendas
         
         dados_vendas = df_vendas[df_vendas[coluna_codigo] == cupom_ativo]
 
         if not dados_vendas.empty:
-            vendas_mes = dados_vendas[coluna_valor_mes].values[0]
+            # Vendas Totais no mês = coluna C (vendas_mes)
+            vendas_mes = dados_vendas[coluna_vendas_mes].values[0]
+            
+            # Quantidade de vendas = coluna B
             qtd = dados_vendas[coluna_qtd].values[0]
+            
+            # Comissão calculada sobre vendas do mês
             comissao = vendas_mes * (PORCENTAGEM_COMISSAO_PADRAO / 100)
+            
+            # Vendas período total = coluna D (valor_total_de_vendas)
             vendas_totais = dados_vendas[coluna_valor_total].values[0]
         else:
             vendas_mes = 0
