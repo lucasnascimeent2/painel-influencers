@@ -310,7 +310,7 @@ def renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais):
         st.markdown(f"""
         <div class='metric-box'>
             <div class='metric-label'>Vendas Totais no mês</div>
-            <div class='metric-value'>R$ {vendas_mes:,.2f}</div>
+            <div class='metric-value'>R$ {float(vendas_mes):,.2f}</div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -318,21 +318,21 @@ def renderizar_resultados(vendas_mes, qtd, comissao, vendas_totais):
         st.markdown(f"""
         <div class='metric-box'>
             <div class='metric-label'>Quantidade de vendas</div>
-            <div class='metric-value'>{qtd}</div>
+            <div class='metric-value'>{int(qtd)}</div>
         </div>
         """, unsafe_allow_html=True)
     
     st.markdown(f"""
     <div class='metric-box'>
         <div class='metric-label'>Sua Comissão (20%)</div>
-        <div class='metric-value-green'>R$ {comissao:,.2f}</div>
+        <div class='metric-value-green'>R$ {float(comissao):,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown(f"""
     <div class='metric-box' style='border-color: #666;'>
         <div class='metric-label'>Vendas período total</div>
-        <div class='metric-value'>R$ {valor_total_de_vendas:,.2f}</div>
+        <div class='metric-value'>R$ {float(vendas_totais):,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -472,4 +472,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
