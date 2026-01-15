@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Configuração da página (DEVE ser a primeira linha de comando streamlit)
+# Configuração da página
 st.set_page_config(page_title="Portal do Influencer", layout="centered")
 
 # --- CONFIGURAÇÕES ---
@@ -28,17 +28,15 @@ def main():
 
     if df is None:
         st.error(f"O arquivo '{ARQUIVO_DADOS}' não foi encontrado.")
-        st.warning("DICA: Verifique se o arquivo da planilha está na mesma pasta e se o nome é exatamente 'vendas.csv' (tudo minúsculo).")
+        st.warning("DICA: Verifique se o arquivo da planilha está na mesma pasta e se o nome é exatamente 'vendas.csv'.")
     else:
         # Área de Login
         st.subheader("Acesso aos Resultados")
         cupom_input = st.text_input("Digite seu Cupom de Parceiro:").strip().upper()
 
         if cupom_input:
-            # Tenta encontrar a coluna correta (flexibilidade para maiúsculas/minúsculas)
-            coluna_codigo = 'código' # Padrão do seu arquivo
-            
-            # Verificação de segurança caso a coluna mude de nome
+            # Tenta encontrar a coluna correta
+            coluna_codigo = 'código' 
             if 'código' not in df.columns and 'Codigo' in df.columns:
                  coluna_codigo = 'Codigo'
 
@@ -48,12 +46,13 @@ def main():
                 if not dados_influencer.empty:
                     vendas_totais = dados_influencer['valor_total_das_vendas'].values[0]
                     quantidade = dados_influencer['quantidade'].values[0]
-                    porcentagem = dados_influencer['porcentagem_das_vendas'].values[0]
                     
+                    # Cálculo da comissão
                     comissao = vendas_totais * (PORCENTAGEM_COMISSAO_PADRAO / 100)
 
                     st.success(f"Dados encontrados para: **{cupom_input}**")
                     
+                    # Exibe apenas as métricas importantes
                     col1, col2, col3 = st.columns(3)
                     with col1:
                         st.metric("Vendas Totais", f"R$ {vendas_totais:,.2f}")
@@ -62,13 +61,12 @@ def main():
                     with col3:
                         st.metric("Sua Comissão (20%)", f"R$ {comissao:,.2f}")
                     
-                    st.info(f"Seu cupom representa {porcentagem}% das vendas totais.")
                 else:
                     st.warning("Cupom não encontrado nas vendas deste período.")
             else:
                 st.error("Erro na Planilha: A coluna 'código' não foi encontrada.")
 
-    # Área Admin
+    # Área Admin (Mantive oculta, mas se quiser tirar também, me avise)
     st.markdown("---")
     with st.expander("Área Administrativa"):
         senha = st.text_input("Senha Admin", type="password")
