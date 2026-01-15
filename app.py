@@ -46,8 +46,8 @@ def main():
         # Título escrito abaixo da logo (como solicitado)
         st.markdown(
             """
-            <h3 style='text-align: center; color: #ffffff; margin-top: -10px;'>
-                Portal de Parceiras Green Express
+            <h3 style='text-align: center; color: #ffffff; margin-top: -8px;'>
+                Portal de Parceiras Green Express 💚
             </h3>
             """, 
             unsafe_allow_html=True
@@ -137,4 +137,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
