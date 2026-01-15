@@ -5,7 +5,6 @@ import pandas as pd
 # 1. CONFIGURAÇÃO INICIAL
 # --------------------------------------------------------------------------
 st.set_page_config(page_title="Portal Green Express", page_icon="💚", layout="wide") 
-# Mudei layout para "wide" para caber tudo na mesma linha melhor
 
 # --------------------------------------------------------------------------
 # 2. DESIGN E PERSONALIZAÇÃO (CSS AVANÇADO)
@@ -25,7 +24,7 @@ def local_css():
             font-weight: 700;
             color: #ffffff;
             font-size: 32px;
-            padding-top: 10px; /* Ajuste fino vertical */
+            padding-top: 10px;
             margin-bottom: 0px;
         }
         .subtitulo {
@@ -36,7 +35,7 @@ def local_css():
         }
 
         /* --- ALINHAMENTO DO FORMULÁRIO DE LOGIN --- */
-        /* Isso faz o botão descer um pouco para alinhar com as caixas de texto */
+        /* Ajuste fino para alinhar o botão com os inputs */
         div[data-testid="stForm"] .stButton {
             margin-top: 28px;
         }
@@ -54,7 +53,7 @@ def local_css():
             border: none !important;
             color: #000000 !important;
             font-weight: bold !important;
-            width: 100%; /* Botão preenche a coluna */
+            width: 100%;
         }
         button[kind="primary"]:hover {
             background-color: #00e673 !important;
@@ -86,6 +85,7 @@ def carregar_dados():
     try:
         df_vendas = pd.read_csv(ARQUIVO_VENDAS)
         df_usuarios = pd.read_csv(ARQUIVO_USUARIOS)
+        # Tratamento de dados para evitar erros de digitação
         df_usuarios['cupom'] = df_usuarios['cupom'].astype(str).str.upper().str.strip()
         df_usuarios['senha'] = df_usuarios['senha'].astype(str).str.strip()
         return df_vendas, df_usuarios
@@ -99,12 +99,11 @@ def main():
     local_css()
     
     # --- CABEÇALHO EM UMA LINHA (LOGO + TEXTO) ---
-    # Coluna 1 (Pequena) para Logo | Coluna 2 (Grande) para Texto
     col_logo, col_texto = st.columns([1, 6])
     
     with col_logo:
         try:
-            st.image("logo.png", width=100) # Ajuste a largura conforme sua logo
+            st.image("logo.png", width=100) # Se não tiver a logo, comente esta linha
         except:
             st.header("💚")
 
@@ -122,17 +121,17 @@ def main():
         st.error("⚠️ Erro: Arquivos 'vendas.csv' ou 'usuario.csv' não encontrados.")
         st.stop()
 
-    # --- LÓGICA DE ESTADO ---
+    # --- LÓGICA DE LOGIN ---
     if 'logado' not in st.session_state:
         st.session_state['logado'] = False
         st.session_state['usuario_atual'] = ''
 
-    # --- TELA DE LOGIN (TUDO EM UMA LINHA) ---
+    # --- TELA DE LOGIN (HORIZONTAL) ---
     if not st.session_state['logado']:
         
         with st.form("login_form"):
             st.write("Acesso Rápido:")
-            # Cria 3 colunas: Cupom | Senha | Botão
+            # 3 Colunas: Cupom | Senha | Botão
             c1, c2, c3 = st.columns([3, 3, 2])
             
             with c1:
@@ -140,7 +139,7 @@ def main():
             with c2:
                 senha_input = st.text_input("Senha", type="password").strip()
             with c3:
-                # O CSS lá em cima alinha este botão com as caixas de texto
+                # O botão alinhado pelo CSS
                 botao_entrar = st.form_submit_button("Acessar", type="primary")
 
         if botao_entrar:
@@ -154,20 +153,20 @@ def main():
                 st.session_state['usuario_atual'] = cupom_input
                 st.rerun()
             else:
-                st.error("Dados inválidos.")
+                st.error("Dados inválidos. Verifique Cupom e Senha.")
 
-    # --- PAINEL LOGADO (RESULTADOS) ---
+    # --- PAINEL DE RESULTADOS (LOGADO) ---
     else:
         cupom_ativo = st.session_state['usuario_atual']
         
         # Barra superior alinhada
-        c_topo1, c_topo2 = st.columns([6, 1])
+        c_topo1, c_topo2 = st.columns([8, 1]) # Ajustei proporção para o botão sair ficar no canto
         c_topo1.success(f"Logada como: **{cupom_ativo}**")
         if c_topo2.button("Sair"):
             st.session_state['logado'] = False
             st.rerun()
 
-        # Processamento
+        # Busca dados
         coluna_codigo = 'código' 
         if 'código' not in df_vendas.columns and 'Codigo' in df_vendas.columns:
             coluna_codigo = 'Codigo'
@@ -180,23 +179,3 @@ def main():
             vendas = dados_vendas['valor_total_das_vendas'].values[0]
             qtd = dados_vendas['quantidade'].values[0]
             comissao = vendas * (PORCENTAGEM_COMISSAO_PADRAO / 100)
-
-            m1, m2, m3 = st.columns(3)
-            m1.metric("Vendas Totais", f"R$ {vendas:,.2f}")
-            m2.metric("Quantidade", f"{qtd}")
-            m3.metric("Comissão (20%)", f"R$ {comissao:,.2f}")
-        else:
-            st.info("Sem vendas registradas no momento.")
-            m1, m2, m3 = st.columns(3)
-            m1.metric("Vendas", "R$ 0,00")
-            m2.metric("Qtd", "0")
-            m3.metric("Comissão", "R$ 0,00")
-
-    # Admin
-    st.markdown("<br>", unsafe_allow_html=True)
-    with st.expander("Admin"):
-        if st.text_input("Senha") == "admin123":
-            st.dataframe(df_vendas)
-
-if __name__ == "__main__":
-    main()
