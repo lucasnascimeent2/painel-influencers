@@ -4,7 +4,7 @@ import pandas as pd
 # --------------------------------------------------------------------------
 # 1. CONFIGURAÇÃO INICIAL
 # --------------------------------------------------------------------------
-st.set_page_config(page_title="Portal de Parceiras Green Express", page_icon="💚", layout="centered")
+st.set_page_config(page_title="Portal de Parceiras Green Express 💚", page_icon="💚", layout="centered")
 
 # --------------------------------------------------------------------------
 # 2. CARREGAR DADOS
@@ -137,3 +137,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
